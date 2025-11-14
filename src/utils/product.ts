@@ -1,4 +1,5 @@
-import { createOrder } from "zmp-sdk";
+// src/utils/product.ts - PHIÊN BẢN ĐƠN GIẢN
+
 import { Option, Product } from "types/product";
 import { getConfig } from "./config";
 import { SelectedOptions } from "types/cart";
@@ -79,37 +80,11 @@ export function isIdentical(
   return true;
 }
 
+// ⚠️ HÀM NÀY KHÔNG CÒN CẦN THIẾT NỮA
+// Vì preview.tsx đã gọi trực tiếp createOrder từ service
+// Giữ lại chỉ để tương thích với code cũ (nếu có)
 const pay = async (amount: number, description?: string, orderData?: any) => {
-  try {
-    // Nếu có orderData, lưu vào Firestore trước   
-      console.log("=== BẮT ĐẦU TẠO ĐƠN HÀNG ===");
-      console.log("Order Data:", orderData);
-      
-      const orderId = await createOrder(orderData);
-      console.log("✅ Đơn hàng đã được lưu với ID:", orderId);
-      console.log("=========================");
-
-    // Sau đó mới gọi thanh toán Zalo (nếu cần)
-    // Comment lại phần thanh toán Zalo nếu chưa cần
-    /*
-    createZaloOrder({
-      desc:
-        description ??
-        `Thanh toán cho ${getConfig((config) => config.app.title)}`,
-      item: [],
-      amount: amount,
-      success: (data) => {
-        console.log("Payment success: ", data);
-      },
-      fail: (err) => {
-        console.log("Payment error: ", err);
-      },
-    });
-    */
-  } catch (error) {
-    console.error("Error in pay function:", error);
-    throw error;
-  }
+  console.warn("⚠️ Hàm pay() không còn được sử dụng. Vui lòng gọi trực tiếp createOrder từ ordersService");
 };
 
 export default pay;
