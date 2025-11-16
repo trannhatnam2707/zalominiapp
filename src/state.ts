@@ -1,5 +1,5 @@
 import { atom, selector, selectorFamily } from "recoil";
-import { getLocation, getPhoneNumber, getUserInfo } from "zmp-sdk";
+import { getLocation, getPhoneNumber, getUserInfo } from "zmp-sdk/apis";
 import logo from "static/logo.png";
 import { Category } from "types/category";
 import { Product, Variant } from "types/product";
@@ -238,8 +238,10 @@ export const phoneState = selector<string | boolean>({
 
     try {
       const { number, token } = await getPhoneNumber({ fail: console.warn });
-      if (number) return number;
-
+      console.log("Zalo API trả về:", { number, token });
+      if (number)    
+      console.log("Số điện thoại người dùng:", number);
+      return number;
       console.warn("Giả lập số điện thoại mặc định: 0337076898");
       return "0337076898";
     } catch (error) {
