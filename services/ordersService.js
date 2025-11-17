@@ -131,28 +131,72 @@ export async function createOrder(orderData) {
  */
 export async function getUserOrders(phoneNumber) {
   try {
+    console.log("🔍 getUserOrders() được gọi");
+    console.log("📱 phoneNumber:", phoneNumber);
+    console.log("📱 phoneNumber type:", typeof phoneNumber);
+    console.log("📱 phoneNumber length:", phoneNumber?.length);
+    
     const ordersCollection = collection(db, 'orders');
-    const q = query(
-      ordersCollection,
-      where('phone_number', '==', phoneNumber),
-      orderBy('created_at', 'desc')
-    );
     
-    const querySnapshot = await getDocs(q);
+    // ✅ TRY 1: Query với where
+    console.log("🔍 Thử query với where...");
+    try {
+      const q = query(
+        ordersCollection,
+        where('phone_number', '==', phoneNumber),
+        orderBy('created_at', 'desc')
+      );
+      
+      const querySnapshot = await getDocs(q);
+      console.log("📊 Kết quả query with where:", querySnapshot.size);
+      
+      if (querySnapshot.size > 0) {
+        const orders = [];
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          console.log("📦 Found order:", doc.id, data);
+          orders.push({
+            id: doc.id,
+            ...data
+          });
+        });
+        
+        console.log('✅ Fetched user orders:', orders);
+        return orders;
+      }
+    } catch (whereError) {
+      console.warn("⚠️ Query with where failed:", whereError);
+      console.warn("⚠️ Có thể thiếu index, thử lấy tất cả rồi filter...");
+    }
+    
+    // ✅ TRY 2: Lấy tất cả rồi filter (fallback)
+    console.log("🔍 Fallback: Lấy tất cả rồi filter...");
+    const allSnapshot = await getDocs(ordersCollection);
+    console.log("📊 Tổng số documents:", allSnapshot.size);
+    
     const orders = [];
-    
-    querySnapshot.forEach((doc) => {
-      orders.push({
-        id: doc.id,
-        ...doc.data()
+    allSnapshot.forEach((doc) => {
+      const data = doc.data();
+      console.log(`📋 Document ${doc.id}:`, {
+        phone_number: data.phone_number,
+        type: typeof data.phone_number,
+        matches: data.phone_number === phoneNumber
       });
+      
+      if (data.phone_number === phoneNumber) {
+        console.log("✅ Khớp! Thêm vào kết quả");
+        orders.push({
+          id: doc.id,
+          ...data
+        });
+      }
     });
     
-    console.log('Fetched user orders:', orders);
+    console.log('✅ Filtered orders:', orders.length);
     return orders;
     
   } catch (error) {
-    console.error('Error fetching user orders:', error);
+    console.error('❌ Error fetching user orders:', error);
     return [];
   }
 }
@@ -184,10 +228,13 @@ export async function getCustomer(phoneNumber) {
  */
 export async function getAllOrders() {
   try {
+    console.log("🔍 getAllOrders() được gọi");
     const ordersCollection = collection(db, 'orders');
     const q = query(ordersCollection, orderBy('created_at', 'desc'));
     
     const querySnapshot = await getDocs(q);
+    console.log("📊 Tổng số orders:", querySnapshot.size);
+    
     const orders = [];
     
     querySnapshot.forEach((doc) => {
@@ -201,6 +248,25 @@ export async function getAllOrders() {
     
   } catch (error) {
     console.error('Error fetching all orders:', error);
-    return [];
+    // Nếu lỗi orderBy (thiếu index), thử lấy không sort
+    try {
+      console.log("⚠️ Thử lấy không sort...");
+      const ordersCollection = collection(db, 'orders');
+      const querySnapshot = await getDocs(ordersCollection);
+      
+      const orders = [];
+      querySnapshot.forEach((doc) => {
+        orders.push({
+          id: doc.id,
+          ...doc.data()
+        });
+      });
+      
+      console.log("✅ Lấy được", orders.length, "orders");
+      return orders;
+    } catch (fallbackError) {
+      console.error('❌ Fallback cũng lỗi:', fallbackError);
+      return [];
+    }
   }
 }

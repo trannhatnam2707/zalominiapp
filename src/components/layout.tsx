@@ -1,3 +1,4 @@
+// src/components/layout.tsx - CẬP NHẬT
 import React, { FC } from "react";
 import { Route, Routes } from "react-router";
 import { Box } from "zmp-ui";
@@ -9,9 +10,13 @@ import NotificationPage from "pages/notification";
 import ProfilePage from "pages/profile";
 import SearchPage from "pages/search";
 import CheckoutResultPage from "pages/result";
+import AccountInfoPage from "pages/account-info"; // ✅ Import trang mới
+import OrderHistoryPage from "pages/order-history"; // ✅ Import trang mới
 import { getSystemInfo } from "zmp-sdk";
 import { ScrollRestoration } from "./scroll-restoration";
 import { useHandlePayment } from "hooks";
+
+import OrderHistoryDebugPage from "pages/order-history-debug";
 
 if (import.meta.env.DEV) {
   document.body.style.setProperty("--zaui-safe-area-inset-top", "24px");
@@ -40,6 +45,13 @@ export const Layout: FC = () => {
           <Route path="/cart" element={<CartPage />}></Route>
           <Route path="/profile" element={<ProfilePage />}></Route>
           <Route path="/result" element={<CheckoutResultPage />}></Route>
+          {/* ✅ Thêm routes mới */}
+          <Route path="/account-info" element={<AccountInfoPage />}></Route>
+          <Route path="/order-history" element={<OrderHistoryPage />}></Route>
+
+          <Route path="/debug-orders" element={<OrderHistoryDebugPage />}></Route>
+
+          
         </Routes>
       </Box>
       <Navigation />

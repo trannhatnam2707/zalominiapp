@@ -230,24 +230,22 @@ export const locationState = selector<{ latitude: string; longitude: string } | 
 });
 
 // --- Phone ---
+
 export const phoneState = selector<string | boolean>({
   key: "phone",
-  get: async ({ get }) => {
+  get: ({ get }) => {
+    // Ưu tiên lấy số điện thoại thủ công trước
+    const manualPhone = get(manualPhoneState);
+    if (manualPhone && manualPhone.length >= 10) {
+      return manualPhone;
+    }
+
+    // Nếu không có số thủ công, thử lấy từ Zalo API
     const requested = get(requestPhoneTriesState);
     if (!requested) return false;
 
-    try {
-      const { number, token } = await getPhoneNumber({ fail: console.warn });
-      console.log("Zalo API trả về:", { number, token });
-      if (number)    
-      console.log("Số điện thoại người dùng:", number);
-      return number;
-      console.warn("Giả lập số điện thoại mặc định: 0337076898");
-      return "0337076898";
-    } catch (error) {
-      console.error(error);
-      return false;
-    }
+    // Trả về false để hiển thị form nhập thủ công
+    return false;
   },
 });
 
@@ -261,3 +259,9 @@ export const deliveryAddressState = atom({
   key: "deliveryAddress",
   default: "",
 })
+
+// ===== THÊM MỚI: Số điện thoại thủ công =====
+export const manualPhoneState = atom<string>({
+  key: "manualPhone",
+  default: "",
+});

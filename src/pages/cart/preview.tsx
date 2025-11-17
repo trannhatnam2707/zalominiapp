@@ -1,4 +1,4 @@
-// src/pages/cart/preview.tsx - PHIÊN BẢN CÓ XIN QUYỀN SĐT
+// src/pages/cart/preview.tsx - CẬP NHẬT SỬ DỤNG MANUAL PHONE
 
 import { DisplayPrice } from "components/display/price";
 import React, { FC, useState } from "react";
@@ -12,8 +12,7 @@ import {
   deliveryAddressState,
   orderNoteState,
   userState,
-  phoneState,
-  requestPhoneTriesState // ✅ Thêm này
+  manualPhoneState, // ✅ Đổi từ phoneState sang manualPhoneState
 } from "state";
 import { Box, Button, Text, useSnackbar } from "zmp-ui";
 import { createOrder } from "../../../services/ordersService";
@@ -30,12 +29,9 @@ export const CartPreview: FC = () => {
   const orderNote = useRecoilValue(orderNoteState);
   
   const user = useRecoilValueLoadable(userState);
-  const phone = useRecoilValueLoadable(phoneState);
+  const manualPhone = useRecoilValue(manualPhoneState); // ✅ Lấy số điện thoại thủ công
   
-  // ✅ State để kích hoạt yêu cầu quyền
-  const setRequestPhone = useSetRecoilState(requestPhoneTriesState);
   const [isProcessing, setIsProcessing] = useState(false);
-  
   const snackbar = useSnackbar();
 
   const handleOrder = async () => {
@@ -54,18 +50,11 @@ export const CartPreview: FC = () => {
         throw new Error("Vui lòng chọn cửa hàng!");
       }
       
-      // 3. ✅ KIỂM TRA VÀ YÊU CẦU QUYỀN SỐ ĐIỆN THOẠI
-      console.log("📱 Phone state:", phone.state);
-      console.log("📱 Phone contents:", phone.contents);
+      // 3. ✅ KIỂM TRA SỐ ĐIỆN THOẠI THỦ CÔNG
+      console.log("📱 Manual phone:", manualPhone);
       
-      if (phone.state === "loading") {
-        throw new Error("Đang tải thông tin số điện thoại...");
-      }
-      
-      if (phone.state === "hasError" || !phone.contents) {
-        console.log("⚠️ Chưa có số điện thoại, yêu cầu quyền...");
-        setRequestPhone((tries) => tries + 1); // Kích hoạt request
-        throw new Error("Vui lòng cấp quyền truy cập số điện thoại!");
+      if (!manualPhone || manualPhone.length < 10) {
+        throw new Error("Vui lòng nhập số điện thoại hợp lệ (10 số)!");
       }
       
       // 4. Validate địa chỉ
@@ -80,15 +69,15 @@ export const CartPreview: FC = () => {
       
       // 6. ✅ LẤY THÔNG TIN USER VÀ PHONE
       const userName = user.state === "hasValue" ? user.contents.name : "Khách hàng";
-      const userPhone = phone.contents as string; // ✅ Lấy số thật từ Zalo
+      const userPhone = manualPhone; // ✅ Sử dụng số điện thoại thủ công
       const userAvatar = user.state === "hasValue" ? user.contents.avatar : "";
       
       console.log("👤 User Name:", userName);
-      console.log("📱 User Phone:", userPhone); // ✅ Log để kiểm tra
+      console.log("📱 User Phone:", userPhone);
       
       // 7. Tạo order data
       const orderData = {
-        userId: userPhone,           // ✅ Số điện thoại thật
+        userId: userPhone,
         userName: userName,
         userAvatar: userAvatar,
         cart: cart,
@@ -134,9 +123,9 @@ export const CartPreview: FC = () => {
 
   // ✅ Hiển thị trạng thái số điện thoại
   const getPhoneStatus = () => {
-    if (phone.state === "loading") return "Đang tải...";
-    if (phone.state === "hasError" || !phone.contents) return "⚠️ Chưa có quyền";
-    return `📱 ${phone.contents}`;
+    if (!manualPhone) return "⚠️ Chưa nhập SĐT";
+    if (manualPhone.length < 10) return "⚠️ SĐT chưa đủ 10 số";
+    return `📱 ${manualPhone}`;
   };
 
   return (
@@ -160,7 +149,7 @@ export const CartPreview: FC = () => {
       </Box>
       <Button
         type="highlight"
-        disabled={!quantity || isProcessing}
+        disabled={!quantity || isProcessing || !manualPhone || manualPhone.length < 10}
         fullWidth
         onClick={handleOrder}
         loading={isProcessing}
