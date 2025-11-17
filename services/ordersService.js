@@ -1,22 +1,14 @@
 import { collection, addDoc, getDocs, query, where, orderBy, Timestamp, doc, setDoc, getDoc } from 'firebase/firestore';
 import { db } from '../src/firebase.js';
 
-// Debug: Check if db is imported correctly
 console.log("🔥 ordersService.js loaded!");
-console.log("🔥 db imported:", db);
-console.log("🔥 db type:", typeof db);
 
 /**
  * Lưu hoặc cập nhật thông tin customer
- * @param {Object} customerData - Thông tin khách hàng
  */
 async function saveCustomer(customerData) {
   try {
     const { phone_number, user_name, address } = customerData;
-    
-    console.log("💾 Saving customer:", { phone_number, user_name, address });
-    
-    // Dùng phone_number làm document ID
     const customerRef = doc(db, 'customers', phone_number);
     
     await setDoc(customerRef, {
@@ -34,8 +26,6 @@ async function saveCustomer(customerData) {
 
 /**
  * Tạo đơn hàng mới
- * @param {Object} orderData - Dữ liệu đơn hàng
- * @returns {Promise<string>} - ID của đơn hàng vừa tạo
  */
 export async function createOrder(orderData) {
   try {
@@ -44,76 +34,80 @@ export async function createOrder(orderData) {
     const {
       userId,           // phone_number
       userName,         // user_name
-      cart,            // cart items
-      selectedStore,   // store info (chỉ để hiển thị, không lưu vào order)
+      cart,            // cart items FULL INFO
+      selectedStore,   
       deliveryTime,    // received_at
-      deliveryAddress, // address người nhận
-      note             // note
+      deliveryAddress, // address
+      note             
     } = orderData;
 
-    console.log("🔍 Validating data...");
-    console.log("- phone_number:", userId);
-    console.log("- user_name:", userName);
-    console.log("- address:", deliveryAddress);
-    console.log("- cart items:", cart.length);
-    console.log("- deliveryTime:", deliveryTime);
-    console.log("- note:", note);
-
-    // 1. Lưu thông tin customer
+    // 1. Lưu customer
     console.log("👤 Step 1: Saving customer...");
     await saveCustomer({
       phone_number: userId,
       user_name: userName,
-      address: deliveryAddress || '' // Lưu địa chỉ người nhận
+      address: deliveryAddress || ''
     });
 
-    // 2. Tạo product_id array từ cart - CHỈ LẤY ID
-    console.log("📋 Step 2: Creating product_id array...");
-    const product_id = cart.map(item => {
-      const id = parseInt(item.product.id);
-      console.log(`  - Product: ${item.product.name} (ID: ${id})`);
-      return id;
+    // 2. ✅ Tạo cart_items với ĐẦY ĐỦ THÔNG TIN
+    console.log("📋 Step 2: Creating cart_items array...");
+    const cart_items = cart.map(item => {
+      // Tính giá cuối cùng cho item này (bao gồm options)
+      const itemPrice = calcFinalPriceForItem(item);
+      
+      console.log(`  - ${item.product.name}`);
+      console.log(`    * Product ID: ${item.product.id}`);
+      console.log(`    * Base price: ${item.product.price}`);
+      console.log(`    * Options:`, item.options);
+      console.log(`    * Quantity: ${item.quantity}`);
+      console.log(`    * Final price per item: ${itemPrice}`);
+      console.log(`    * Total: ${itemPrice * item.quantity}`);
+      
+      return {
+        product_id: parseInt(item.product.id),
+        product_name: item.product.name,
+        product_image: item.product.image,
+        base_price: item.product.price,
+        options: item.options || {},          // ✅ Lưu options (size, topping)
+        quantity: item.quantity,              // ✅ Lưu quantity
+        final_price: itemPrice,               // ✅ Giá sau khi tính options
+        total_price: itemPrice * item.quantity // ✅ Tổng cho item này
+      };
     });
-    console.log("Product IDs:", product_id);
 
-    // 3. Tính tổng tiền từ cart
+    console.log("📦 Cart items structure:", cart_items);
+
+    // 3. ✅ Tính tổng tiền CHÍNH XÁC
     console.log("💰 Step 3: Calculating total amount...");
-    const total_amount = cart.reduce((total, item) => {
-      const itemPrice = item.product.price || 0;
-      const quantity = item.quantity || 1;
-      console.log(`  - ${item.product.name}: ${itemPrice} x ${quantity} = ${itemPrice * quantity}`);
-      return total + (itemPrice * quantity);
+    const total_amount = cart_items.reduce((sum, item) => {
+      return sum + item.total_price;
     }, 0);
     console.log("Total amount:", total_amount);
 
-    // 4. Tạo order document - ĐÚNG CẤU TRÚC FIRESTORE
+    // 4. Tạo order document
     console.log("📄 Step 4: Creating order document...");
     const order = {
-      phone_number: userId,           // Số điện thoại khách hàng
-      address: deliveryAddress || '', // Địa chỉ người nhận
-      note: note || '',               // Ghi chú
-      product_id: product_id,         // Array ID sản phẩm [1, 2, 3]
-      total_amount: total_amount,     // ✅ Tổng tiền đơn hàng
-      created_at: Timestamp.now(),    // Thời gian tạo
-      received_at: Timestamp.fromMillis(deliveryTime) // Thời gian nhận
+      phone_number: userId,
+      address: deliveryAddress || '',
+      note: note || '',
+      cart_items: cart_items,           // ✅ Lưu full cart items
+      total_amount: total_amount,       // ✅ Tổng tiền chính xác
+      created_at: Timestamp.now(),
+      received_at: Timestamp.fromMillis(deliveryTime)
     };
 
     console.log("📦 Order structure:");
     console.log("  - phone_number:", order.phone_number);
-    console.log("  - address:", order.address);
-    console.log("  - note:", order.note);
-    console.log("  - product_id:", order.product_id);
+    console.log("  - cart_items:", order.cart_items.length, "items");
     console.log("  - total_amount:", order.total_amount);
-    console.log("  - created_at:", order.created_at);
-    console.log("  - received_at:", order.received_at);
 
-    // 5. Thêm vào Firestore collection orders
+    // 5. Lưu vào Firestore
     console.log("💾 Step 5: Adding to Firestore...");
     const ordersCollection = collection(db, 'orders'); 
     const docRef = await addDoc(ordersCollection, order);
     console.log("✅ Document added with ID:", docRef.id);
 
-    // 6. Cập nhật document với field 'id'
+    // 6. Cập nhật với field 'id'
     console.log("🔄 Step 6: Updating document with id field...");
     const orderDocRef = doc(db, 'orders', docRef.id);
     await setDoc(orderDocRef, {
@@ -126,32 +120,74 @@ export async function createOrder(orderData) {
 
   } catch (error) {
     console.error("❌❌❌ ERROR IN createOrder() ❌❌❌");
-    console.error("Error type:", typeof error);
-    console.error("Error name:", error.name);
-    console.error("Error message:", error.message);
-    console.error("Error code:", error.code);
     console.error("Full error:", error);
-    console.error("Error stack:", error.stack);
     throw error;
   }
 }
 
 /**
- * Lấy tất cả đơn hàng của user theo phone number
- * @param {string} phoneNumber - Số điện thoại
- * @returns {Promise<Array>} - Danh sách đơn hàng
+ * ✅ HÀM TÍNH GIÁ CUỐI CÙNG CHO 1 ITEM (bao gồm options)
+ */
+function calcFinalPriceForItem(cartItem) {
+  const { product, options } = cartItem;
+  let finalPrice = product.price;
+
+  // Áp dụng sale nếu có
+  if (product.sale) {
+    if (product.sale.type === "fixed") {
+      finalPrice = product.price - product.sale.amount;
+    } else {
+      finalPrice = product.price * (1 - product.sale.percent);
+    }
+  }
+
+  // Áp dụng giá thay đổi từ options (size, topping, etc)
+  if (options && product.variants) {
+    for (const variantKey in options) {
+      const variant = product.variants.find((v) => v.id === variantKey);
+      if (variant) {
+        const currentOption = options[variantKey];
+        
+        if (typeof currentOption === "string") {
+          // Single option (e.g., size)
+          const selected = variant.options.find((o) => o.id === currentOption);
+          if (selected && selected.priceChange) {
+            if (selected.priceChange.type === "fixed") {
+              finalPrice += selected.priceChange.amount;
+            } else {
+              finalPrice += product.price * selected.priceChange.percent;
+            }
+          }
+        } else if (Array.isArray(currentOption)) {
+          // Multiple options (e.g., toppings)
+          currentOption.forEach(optionId => {
+            const selected = variant.options.find((o) => o.id === optionId);
+            if (selected && selected.priceChange) {
+              if (selected.priceChange.type === "fixed") {
+                finalPrice += selected.priceChange.amount;
+              } else {
+                finalPrice += product.price * selected.priceChange.percent;
+              }
+            }
+          });
+        }
+      }
+    }
+  }
+
+  return finalPrice;
+}
+
+/**
+ * Lấy tất cả đơn hàng của user
  */
 export async function getUserOrders(phoneNumber) {
   try {
-    console.log("🔍 getUserOrders() được gọi");
-    console.log("📱 phoneNumber:", phoneNumber);
-    console.log("📱 phoneNumber type:", typeof phoneNumber);
-    console.log("📱 phoneNumber length:", phoneNumber?.length);
+    console.log("🔍 getUserOrders() - phoneNumber:", phoneNumber);
     
     const ordersCollection = collection(db, 'orders');
     
-    // ✅ TRY 1: Query với where
-    console.log("🔍 Thử query với where...");
+    // Try query with where
     try {
       const q = query(
         ordersCollection,
@@ -160,43 +196,29 @@ export async function getUserOrders(phoneNumber) {
       );
       
       const querySnapshot = await getDocs(q);
-      console.log("📊 Kết quả query with where:", querySnapshot.size);
+      console.log("📊 Found orders:", querySnapshot.size);
       
       if (querySnapshot.size > 0) {
         const orders = [];
         querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          console.log("📦 Found order:", doc.id, data);
           orders.push({
             id: doc.id,
-            ...data
+            ...doc.data()
           });
         });
-        
-        console.log('✅ Fetched user orders:', orders);
         return orders;
       }
     } catch (whereError) {
-      console.warn("⚠️ Query with where failed:", whereError);
-      console.warn("⚠️ Có thể thiếu index, thử lấy tất cả rồi filter...");
+      console.warn("⚠️ Query with where failed, trying fallback...");
     }
     
-    // ✅ TRY 2: Lấy tất cả rồi filter (fallback)
-    console.log("🔍 Fallback: Lấy tất cả rồi filter...");
+    // Fallback: get all then filter
     const allSnapshot = await getDocs(ordersCollection);
-    console.log("📊 Tổng số documents:", allSnapshot.size);
-    
     const orders = [];
+    
     allSnapshot.forEach((doc) => {
       const data = doc.data();
-      console.log(`📋 Document ${doc.id}:`, {
-        phone_number: data.phone_number,
-        type: typeof data.phone_number,
-        matches: data.phone_number === phoneNumber
-      });
-      
       if (data.phone_number === phoneNumber) {
-        console.log("✅ Khớp! Thêm vào kết quả");
         orders.push({
           id: doc.id,
           ...data
@@ -214,9 +236,7 @@ export async function getUserOrders(phoneNumber) {
 }
 
 /**
- * Lấy thông tin customer theo phone number
- * @param {string} phoneNumber - Số điện thoại
- * @returns {Promise<Object|null>} - Thông tin customer
+ * Lấy thông tin customer
  */
 export async function getCustomer(phoneNumber) {
   try {
@@ -235,35 +255,29 @@ export async function getCustomer(phoneNumber) {
 }
 
 /**
- * Lấy tất cả đơn hàng (cho admin)
- * @returns {Promise<Array>} - Danh sách tất cả đơn hàng
+ * Lấy tất cả đơn hàng (admin)
  */
 export async function getAllOrders() {
   try {
-    console.log("🔍 getAllOrders() được gọi");
+    console.log("🔍 getAllOrders()");
     const ordersCollection = collection(db, 'orders');
-    const q = query(ordersCollection, orderBy('created_at', 'desc'));
     
-    const querySnapshot = await getDocs(q);
-    console.log("📊 Tổng số orders:", querySnapshot.size);
-    
-    const orders = [];
-    
-    querySnapshot.forEach((doc) => {
-      orders.push({
-        id: doc.id,
-        ...doc.data()
-      });
-    });
-    
-    return orders;
-    
-  } catch (error) {
-    console.error('Error fetching all orders:', error);
-    // Nếu lỗi orderBy (thiếu index), thử lấy không sort
     try {
-      console.log("⚠️ Thử lấy không sort...");
-      const ordersCollection = collection(db, 'orders');
+      const q = query(ordersCollection, orderBy('created_at', 'desc'));
+      const querySnapshot = await getDocs(q);
+      
+      const orders = [];
+      querySnapshot.forEach((doc) => {
+        orders.push({
+          id: doc.id,
+          ...doc.data()
+        });
+      });
+      
+      return orders;
+    } catch (error) {
+      // Fallback without orderBy
+      console.log("⚠️ Trying without orderBy...");
       const querySnapshot = await getDocs(ordersCollection);
       
       const orders = [];
@@ -274,11 +288,10 @@ export async function getAllOrders() {
         });
       });
       
-      console.log("✅ Lấy được", orders.length, "orders");
       return orders;
-    } catch (fallbackError) {
-      console.error('❌ Fallback cũng lỗi:', fallbackError);
-      return [];
     }
+  } catch (error) {
+    console.error('❌ Error fetching all orders:', error);
+    return [];
   }
 }
