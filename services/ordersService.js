@@ -71,18 +71,29 @@ export async function createOrder(orderData) {
     console.log("📋 Step 2: Creating product_id array...");
     const product_id = cart.map(item => {
       const id = parseInt(item.product.id);
-      console.log(`  - Product1: ${item.product.name} (ID: ${id})`);
+      console.log(`  - Product: ${item.product.name} (ID: ${id})`);
       return id;
     });
     console.log("Product IDs:", product_id);
 
-    // 3. Tạo order document - ĐÚNG CẤU TRÚC FIRESTORE
-    console.log("📄 Step 3: Creating order document...");
+    // 3. Tính tổng tiền từ cart
+    console.log("💰 Step 3: Calculating total amount...");
+    const total_amount = cart.reduce((total, item) => {
+      const itemPrice = item.product.price || 0;
+      const quantity = item.quantity || 1;
+      console.log(`  - ${item.product.name}: ${itemPrice} x ${quantity} = ${itemPrice * quantity}`);
+      return total + (itemPrice * quantity);
+    }, 0);
+    console.log("Total amount:", total_amount);
+
+    // 4. Tạo order document - ĐÚNG CẤU TRÚC FIRESTORE
+    console.log("📄 Step 4: Creating order document...");
     const order = {
       phone_number: userId,           // Số điện thoại khách hàng
       address: deliveryAddress || '', // Địa chỉ người nhận
       note: note || '',               // Ghi chú
       product_id: product_id,         // Array ID sản phẩm [1, 2, 3]
+      total_amount: total_amount,     // ✅ Tổng tiền đơn hàng
       created_at: Timestamp.now(),    // Thời gian tạo
       received_at: Timestamp.fromMillis(deliveryTime) // Thời gian nhận
     };
@@ -92,17 +103,18 @@ export async function createOrder(orderData) {
     console.log("  - address:", order.address);
     console.log("  - note:", order.note);
     console.log("  - product_id:", order.product_id);
+    console.log("  - total_amount:", order.total_amount);
     console.log("  - created_at:", order.created_at);
     console.log("  - received_at:", order.received_at);
 
-    // 4. Thêm vào Firestore collection orders
-    console.log("💾 Step 4: Adding to Firestore...");
+    // 5. Thêm vào Firestore collection orders
+    console.log("💾 Step 5: Adding to Firestore...");
     const ordersCollection = collection(db, 'orders'); 
     const docRef = await addDoc(ordersCollection, order);
     console.log("✅ Document added with ID:", docRef.id);
 
-    // 5. Cập nhật document với field 'id'
-    console.log("🔄 Step 5: Updating document with id field...");
+    // 6. Cập nhật document với field 'id'
+    console.log("🔄 Step 6: Updating document with id field...");
     const orderDocRef = doc(db, 'orders', docRef.id);
     await setDoc(orderDocRef, {
       id: docRef.id
