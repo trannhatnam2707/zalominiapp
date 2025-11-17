@@ -49,16 +49,43 @@ export async function createOrder(orderData) {
       address: deliveryAddress || ''
     });
 
-    // 2. ✅ Tạo cart_items với ĐẦY ĐỦ THÔNG TIN
+    // 2. ✅ Tạo cart_items với ĐẦY ĐỦ THÔNG TIN (bao gồm labels)
     console.log("📋 Step 2: Creating cart_items array...");
     const cart_items = cart.map(item => {
       // Tính giá cuối cùng cho item này (bao gồm options)
       const itemPrice = calcFinalPriceForItem(item);
       
+      // ✅ Tạo options_display với labels thay vì ids
+      const options_display = {};
+      if (item.options && item.product.variants) {
+        for (const variantKey in item.options) {
+          const variant = item.product.variants.find(v => v.id === variantKey);
+          if (variant) {
+            const currentOption = item.options[variantKey];
+            
+            if (typeof currentOption === "string") {
+              // Single option (e.g., size)
+              const selected = variant.options.find(o => o.id === currentOption);
+              if (selected) {
+                options_display[variant.label || variant.id] = selected.label || selected.id;
+              }
+            } else if (Array.isArray(currentOption)) {
+              // Multiple options (e.g., toppings)
+              const selectedLabels = currentOption.map(optionId => {
+                const selected = variant.options.find(o => o.id === optionId);
+                return selected ? (selected.label || selected.id) : optionId;
+              });
+              options_display[variant.label || variant.id] = selectedLabels;
+            }
+          }
+        }
+      }
+      
       console.log(`  - ${item.product.name}`);
       console.log(`    * Product ID: ${item.product.id}`);
       console.log(`    * Base price: ${item.product.price}`);
       console.log(`    * Options:`, item.options);
+      console.log(`    * Options Display:`, options_display);
       console.log(`    * Quantity: ${item.quantity}`);
       console.log(`    * Final price per item: ${itemPrice}`);
       console.log(`    * Total: ${itemPrice * item.quantity}`);
@@ -68,7 +95,8 @@ export async function createOrder(orderData) {
         product_name: item.product.name,
         product_image: item.product.image,
         base_price: item.product.price,
-        options: item.options || {},          // ✅ Lưu options (size, topping)
+        options: item.options || {},          // ✅ Lưu options gốc (với ids)
+        options_display: options_display,     // ✅ Lưu options với labels để hiển thị
         quantity: item.quantity,              // ✅ Lưu quantity
         final_price: itemPrice,               // ✅ Giá sau khi tính options
         total_price: itemPrice * item.quantity // ✅ Tổng cho item này

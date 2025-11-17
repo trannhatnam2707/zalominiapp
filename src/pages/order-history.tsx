@@ -1,4 +1,4 @@
-// src/pages/order-history.tsx - SỬ DỤNG CART_ITEMS
+// src/pages/order-history.tsx - FIXED VERSION
 import React, { FC, useEffect, useState } from "react";
 import { Box, Header, Page, Text, Button } from "zmp-ui";
 import { useRecoilState } from "recoil";
@@ -13,6 +13,7 @@ interface CartItem {
   product_image: string;
   base_price: number;
   options: Record<string, any>;
+  options_display?: Record<string, any>; // ✅ Thêm field mới
   quantity: number;
   final_price: number;
   total_price: number;
@@ -23,7 +24,7 @@ interface Order {
   phone_number: string;
   address: string;
   note: string;
-  cart_items: CartItem[];      // ✅ Đổi từ product_id sang cart_items
+  cart_items: CartItem[];
   total_amount: number;
   created_at: Timestamp;
   received_at: Timestamp;
@@ -65,15 +66,18 @@ const OrderHistoryPage: FC = () => {
     loadOrders();
   }, [phone]);
 
-  // ✅ Hiển thị options (size, topping)
-  const formatOptions = (options: Record<string, any>): string => {
-    if (!options || Object.keys(options).length === 0) {
+  // ✅ Hiển thị options (ưu tiên options_display nếu có, fallback về options)
+  const formatOptions = (options_display?: Record<string, any>, options?: Record<string, any>): string => {
+    // Ưu tiên hiển thị options_display (có labels)
+    const displayData = options_display || options;
+    
+    if (!displayData || Object.keys(displayData).length === 0) {
       return "";
     }
     
     const parts: string[] = [];
-    for (const key in options) {
-      const value = options[key];
+    for (const key in displayData) {
+      const value = displayData[key];
       if (Array.isArray(value)) {
         parts.push(`${key}: ${value.join(", ")}`);
       } else {
@@ -210,10 +214,10 @@ const OrderHistoryPage: FC = () => {
                           {item.product_name}
                         </Text>
                         
-                        {/* Options */}
-                        {formatOptions(item.options) && (
+                        {/* Options - ✅ SỬ DỤNG OPTIONS_DISPLAY */}
+                        {formatOptions(item.options_display, item.options) && (
                           <Text size="xxxSmall" className="text-gray mt-1">
-                            {formatOptions(item.options)}
+                            {formatOptions(item.options_display, item.options)}
                           </Text>
                         )}
                         
