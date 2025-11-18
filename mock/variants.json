@@ -7,7 +7,7 @@
     "options": [
       {
         "id": "s",
-        "label": "Nhỏ",
+        "label": "Size S",
         "priceChange": {
           "type": "percent",
           "percent": -0.2
@@ -15,11 +15,11 @@
       },
       {
         "id": "m",
-        "label": "Vừa"
+        "label": "Size M"
       },
       {
         "id": "l",
-        "label": "To",
+        "label": "Size L",
         "priceChange": {
           "type": "percent",
           "percent": 0.2
@@ -28,41 +28,41 @@
     ]
   },
   {
-    "id": "topping",
-    "label": "Topping",
+    "id": "tuy-chinh",
+    "label": "Tuỳ chỉnh",
     "type": "multiple",
-    "default": ["t1", "t4"],
+    "default": ["vai-thuong"],
     "options": [
       {
-        "id": "t1",
-        "label": "Trân châu",
+        "id": "theu-ten",
+        "label": "Thêu tên",
         "priceChange": {
           "type": "fixed",
-          "amount": 5000
+          "amount": 150000
         }
       },
       {
-        "id": "t2",
-        "label": "Bánh flan",
+        "id": "vai-cao-cap",
+        "label": "Vải cao cấp (Premium)",
         "priceChange": {
           "type": "fixed",
-          "amount": 10000
+          "amount": 1000000
         }
       },
       {
-        "id": "t3",
-        "label": "Trang trí",
+        "id": "may-do",
+        "label": "May đo theo số đo",
         "priceChange": {
           "type": "percent",
-          "percent": 0.15
+          "percent": 0.30
         }
       },
       {
-        "id": "t4",
-        "label": "Không lấy đá",
+        "id": "vai-thuong",
+        "label": "Gói tiêu chuẩn",
         "priceChange": {
           "type": "fixed",
-          "amount": -5000
+          "amount": -50000
         }
       }
     ]

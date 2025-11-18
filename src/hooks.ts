@@ -85,7 +85,6 @@ export function useToBeImplemented() {
 }
 
 // ===== HOOK CHO CHECKOUT (ĐÃ SỬA) =====
-// ===== HOOK CHO CHECKOUT (ĐÃ SỬA) =====
 export function useCheckout() {
   const [isProcessing, setIsProcessing] = useState(false);
 

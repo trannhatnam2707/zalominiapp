@@ -1,110 +1,110 @@
 [
   {
     "id": 1,
-    "name": "Caramel Latte",
-    "price": 35000,
-    "image": "https://stc-zmp.zadn.vn/templates/zaui-coffee/dummy/product-square-1.webp",
-    "description": "There is a set of mock banners available <u>here</u> in three colours and in a range of standard banner sizes",
-    "categoryId": ["coffee", "drinks"],
-    "variantId": ["size", "topping"]
+    "name": "Vest Nam Classic (Đen)",
+    "price": 3500000,
+    "image": "https://sakurafashion.vn/upload/a/7581-the-gioi-vest-nam-753.jpg",
+    "description": "Bộ vest nam 2 khuy tiêu chuẩn, chất liệu vải poly-blend co giãn nhẹ, phù hợp cho môi trường công sở.",
+    "categoryId": ["vest-nam"],
+    "variantId": ["size", "tuy-chinh"]
   },
   {
     "id": 2,
-    "name": "Mocha Frappuccino",
-    "price": 45000,
-    "image": "https://stc-zmp.zadn.vn/templates/zaui-coffee/dummy/product-square-2.webp",
-    "description": "There is a set of mock banners available <u>here</u> in three colours and in a range of standard banner sizes",
-    "categoryId": ["coffee"],
-    "variantId": ["size", "topping"]
+    "name": "Vest Nữ Công Sở (Xanh Navy)",
+    "price": 4500000,
+    "image": "https://dongphuc.com/vnt_upload/product/11_2022/69.jpg",
+    "description": "Thiết kế vest nữ hiện đại, tôn dáng, bao gồm áo khoác và quần âu đồng bộ. Chất liệu vải nhập khẩu.",
+    "categoryId": ["vest-nu"],
+    "variantId": ["size", "tuy-chinh"]
   },
   {
     "id": 3,
-    "name": "Grilled Pork Banh Mi",
-    "price": 30000,
-    "image": "https://stc-zmp.zadn.vn/templates/zaui-coffee/dummy/product-square-3.webp",
-    "description": "There is a set of mock banners available <u>here</u> in three colours and in a range of standard banner sizes",
-    "categoryId": ["food", "bread"],
+    "name": "Áo Sơ Mi Lụa (Trắng)",
+    "price": 300000,
+    "image": "https://product.hstatic.net/1000096703/product/0_77fceb838bc947f39766ac196c6ca66f_master.jpg",
+    "description": "Áo sơ mi lụa cao cấp, mỏng nhẹ, thấm hút mồ hôi, lựa chọn hoàn hảo để mặc trong vest.",
+    "categoryId": ["ao-somi", "vest-nam", "vest-nu"],
     "variantId": ["size"]
   },
   {
     "id": 4,
-    "name": "Pizza",
-    "price": 28000,
-    "image": "https://stc-zmp.zadn.vn/templates/zaui-coffee/dummy/product-square-4.webp",
-    "description": "There is a set of mock banners available <u>here</u> in three colours and in a range of standard banner sizes",
-    "categoryId": ["food"],
+    "name": "Quần Âu Nam (Xám Ghi)",
+    "price": 850000,
+    "image": "https://product.hstatic.net/1000333436/product/4_38838097c24a4fd18b767122336fe17d_master.jpg",
+    "description": "Quần âu nam ống côn, form dáng trẻ trung, dễ dàng phối đồ với nhiều loại áo sơ mi và vest.",
+    "categoryId": ["quan-au"],
     "variantId": ["size"]
   },
   {
     "id": 5,
-    "name": "Vanilla Latte",
-    "price": 35000,
-    "image": "https://stc-zmp.zadn.vn/templates/zaui-coffee/dummy/product-square-5.webp",
-    "description": "There is a set of mock banners available <u>here</u> in three colours and in a range of standard banner sizes",
-    "categoryId": ["coffee", "matcha"],
-    "variantId": ["size", "topping"]
+    "name": "Vest Nam Kẻ Sọc",
+    "price": 3850000,
+    "image": "https://www.vestonduynguyen.com/sites/default/files/styles/style_360x507/public/sanpham/chinhsv1122.png?itok=lY0Tf3zv",
+    "description": "Mẫu vest kẻ sọc tạo cảm giác cao ráo, lịch lãm. Phù hợp cho các buổi gặp mặt đối tác.",
+    "categoryId": ["vest-nam"],
+    "variantId": ["size", "tuy-chinh"]
   },
   {
     "id": 6,
-    "name": "Caramel Macchiato",
-    "price": 38000,
-    "image": "https://stc-zmp.zadn.vn/templates/zaui-coffee/dummy/product-square-6.webp",
-    "description": "There is a set of mock banners available <u>here</u> in three colours and in a range of standard banner sizes",
-    "categoryId": ["coffee", "milktea"],
-    "variantId": ["size", "topping"]
+    "name": "Áo Ghi-lê Nam",
+    "price": 780000,
+    "image": "https://4men.com.vn/thumbs/2023/07/ao-gile-tron-4-nut-form-slimfit-ag036-mau-den-34468-p.jpg",
+    "description": "Áo ghi-lê 5 khuy, có đai điều chỉnh sau lưng, tăng thêm sự chuyên nghiệp cho bộ suit 3 mảnh.",
+    "categoryId": ["ghi-le", "vest-nam"],
+    "variantId": ["size", "tuy-chinh"]
   },
   {
     "id": 7,
-    "name": "Espresso",
-    "price": 32000,
-    "image": "https://stc-zmp.zadn.vn/templates/zaui-coffee/dummy/product-square-7.webp",
-    "description": "There is a set of mock banners available <u>here</u> in three colours and in a range of standard banner sizes",
-    "categoryId": ["coffee"],
-    "variantId": ["size", "topping"]
+    "name": "Cà vạt Lụa (Bản nhỏ)",
+    "price": 320000,
+    "image": "https://cavatcaocap.com/wp-content/uploads/2023/01/CL6XDT004-1-gl.webp",
+    "description": "Phụ kiện không thể thiếu, cà vạt lụa 100% với hoa văn tinh tế.",
+    "categoryId": ["phu-kien"],
+    "variantId": ["tuy-chinh"]
   },
   {
     "id": 8,
-    "name": "Green Tea Latte",
-    "price": 25000,
-    "image": "https://stc-zmp.zadn.vn/templates/zaui-coffee/dummy/product-square-8.webp",
-    "description": "There is a set of mock banners available <u>here</u> in three colours and in a range of standard banner sizes",
-    "categoryId": ["matcha"],
-    "variantId": ["size", "topping"]
+    "name": "Váy Công Sở (Chữ A)",
+    "price": 450000,
+    "image": "https://cdn.kkfashion.vn/26050-large_default/chan-vay-cong-so-dang-chu-a-mau-den-cv06-05.jpg",
+    "description": "Váy công sở chữ A, dài qua gối, phối hợp hoàn hảo với áo sơ mi và vest nữ.",
+    "categoryId": ["vay-nu", "vest-nu"],
+    "variantId": ["size"]
   },
   {
     "id": 9,
-    "name": "Bộ 3 Blue Corner Coffee siêu HOT",
-    "image": "https://stc-zmp.zadn.vn/templates/zaui-coffee/dummy/product-rect-1.webp",
-    "price": 25000,
+    "name": "Bộ 3 Phụ Kiện Lịch Lãm",
+    "image": "https://cavatcaocap.com/wp-content/uploads/2023/03/BMSTK002-gl.jpg",
+    "price": 1250000,
     "sale": {
       "type": "percent",
       "percent": 0.2
     },
-    "description": "There is a set of mock banners available <u>here</u> in three colours and in a range of standard banner sizes",
-    "categoryId": ["coffee", "milktea", "drinks"],
-    "variantId": ["size", "topping"]
+    "description": "Combo bao gồm 1 Cà vạt, 1 Kẹp cà vạt và 1 đôi Khuy măng sét (Cufflinks) cao cấp.",
+    "categoryId": ["phu-kien"],
+    "variantId": ["tuy-chinh"]
   },
   {
     "id": 10,
-    "name": "Combo Hi Tea Aroma",
-    "image": "https://stc-zmp.zadn.vn/templates/zaui-coffee/dummy/product-rect-2.webp",
-    "price": 57000,
+    "name": "Combo Vest Nam + Sơ Mi",
+    "image": "https://lystailor.com/wp-content/uploads/ao-so-mi-mac-vest-2.jpg",
+    "price": 3800000,
     "sale": {
       "type": "fixed",
-      "amount": 7000
+      "amount": 300000
     },
-    "description": "There is a set of mock banners available <u>here</u> in three colours and in a range of standard banner sizes",
-    "categoryId": ["coffee", "drinks"],
-    "variantId": ["size", "topping"]
+    "description": "Tiết kiệm hơn khi mua combo 1 bộ Vest Nam Classic và 1 Áo Sơ Mi Lụa Trắng.",
+    "categoryId": ["vest-nam", "ao-somi"],
+    "variantId": ["size", "tuy-chinh"]
   },
   {
     "id": 11,
-    "name": "Milk Tea Combo",
-    "price": 55000,
-    "image": "https://stc-zmp.zadn.vn/templates/zaui-coffee/dummy/product-rect-3.webp",
-    "description": "There is a set of mock banners available <u>here</u> in three colours and in a range of standard banner sizes",
-    "categoryId": ["milktea"],
-    "variantId": ["size", "topping"],
+    "name": "Combo Vest Nữ + Váy",
+    "price": 4950000,
+    "image": "https://cache.maysoichivang.com/wp-content/uploads/2022/01/bo-vay-vest-nu-sang-trong.png",
+    "description": "Trọn bộ trang phục công sở cho nữ, bao gồm Vest Nữ và Váy Chữ A đồng bộ.",
+    "categoryId": ["vest-nu", "vay-nu"],
+    "variantId": ["size", "tuy-chinh"],
     "sale": {
       "type": "percent",
       "percent": 0.5

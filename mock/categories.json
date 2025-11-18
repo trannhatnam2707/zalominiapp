@@ -1,37 +1,37 @@
 [
   {
-    "id": "coffee",
-    "name": "Cà phê",
-    "icon": "https://stc-zmp.zadn.vn/templates/zaui-coffee/dummy/category-coffee.svg"
+    "id": "vest-nam",
+    "name": "Vest Nam",
+    "icon": "https://png.pngtree.com/png-vector/20200612/ourlarge/pngtree-vest-men-suit-png-image_2233557.jpg"
   },
   {
-    "id": "matcha",
-    "name": "Trà xanh",
-    "icon": "https://stc-zmp.zadn.vn/templates/zaui-coffee/dummy/category-matcha.svg"
+    "id": "vest-nu",
+    "name": "Vest Nữ",
+    "icon": "https://png.pngtree.com/png-clipart/20240107/original/pngtree-modern-ladies-suit-mockup-white-background-png-image_14046456.png"
   },
   {
-    "id": "food",
-    "name": "Đồ ăn vặt",
-    "icon": "https://stc-zmp.zadn.vn/templates/zaui-coffee/dummy/category-food.svg"
+    "id": "ao-somi",
+    "name": "Áo Sơ Mi",
+    "icon": "https://bizweb.dktcdn.net/100/415/697/products/ta9049-zogku2pg-1-0uit-hinh-mat-truoc-0.jpg?v=1701331804480"
   },
   {
-    "id": "milktea",
-    "name": "Trà sữa",
-    "icon": "https://stc-zmp.zadn.vn/templates/zaui-coffee/dummy/category-milktea.svg"
+    "id": "quan-au",
+    "name": "Quần Âu",
+    "icon": "https://product.hstatic.net/200000163591/product/quan-au-baggy-nam-wlp27__1__5c79a48e92d74dae9f4874e00e9fdbda_large.png"
   },
   {
-    "id": "drinks",
-    "name": "Giải khát",
-    "icon": "https://stc-zmp.zadn.vn/templates/zaui-coffee/dummy/category-drinks.svg"
+    "id": "ghi-le",
+    "name": "Áo Ghi-lê",
+    "icon": "https://product.hstatic.net/200000691337/product/ghi_le_kem_98d4090ee44943f0bc6cc31fec8cb2ab_master.jpg"
   },
   {
-    "id": "bread",
-    "name": "Bánh mỳ",
-    "icon": "https://stc-zmp.zadn.vn/templates/zaui-coffee/dummy/category-bread.svg"
+    "id": "phu-kien",
+    "name": "Phụ Kiện",
+    "icon": "https://image.made-in-china.com/202f0j00vSlVYIWtgRkK/Personalized-Apparel-Sticker-String-Hang-Metal-Tags-for-Garment-Accessories-and-Home-Textile-Clothing-Label-Brand-Logo.webp"
   },
   {
-    "id": "juice",
-    "name": "Nước ép",
-    "icon": "https://stc-zmp.zadn.vn/templates/zaui-coffee/dummy/category-juice.svg"
+    "id": "vay-nu",
+    "name": "Váy Công Sở",
+    "icon": "https://cdn.kkfashion.vn/img/cms/202303/meo-chon-vay-nu-dep-theo-dang-nguoi-cuc-chuan-cho-cac-chi-em-6.jpg"
   }
 ]

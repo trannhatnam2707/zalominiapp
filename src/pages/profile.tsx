@@ -1,12 +1,11 @@
-// src/pages/profile.tsx - CẬP NHẬT
+// src/pages/profile.tsx - ĐÃ XÓA PHẦN ĐÁNH GIÁ VÀ LIÊN HỆ
 import React, { FC } from "react";
 import { Box, Header, Icon, Page, Text } from "zmp-ui";
 import subscriptionDecor from "static/subscription-decor.svg";
 import { ListRenderer } from "components/list-renderer";
-import { useToBeImplemented } from "hooks";
 import { useRecoilCallback } from "recoil";
 import { userState } from "state";
-import { useNavigate } from "react-router"; // ✅ Thêm import
+import { useNavigate } from "react-router";
 
 const Subscription: FC = () => {
   const requestUserInfo = useRecoilCallback(
@@ -38,8 +37,7 @@ const Subscription: FC = () => {
 };
 
 const Personal: FC = () => {
-  const navigate = useNavigate(); // ✅ Thêm hook navigate
-  const onClick = useToBeImplemented();
+  const navigate = useNavigate();
 
   return (
     <Box className="m-4">
@@ -56,7 +54,7 @@ const Personal: FC = () => {
                 <Icon icon="zi-chevron-right" />
               </Box>
             ),
-            onClick: () => navigate("/account-info"), // ✅ Navigate đến trang thông tin tài khoản
+            onClick: () => navigate("/account-info"),
           },
           {
             left: <Icon icon="zi-clock-2" />,
@@ -68,51 +66,12 @@ const Personal: FC = () => {
                 <Icon icon="zi-chevron-right" />
               </Box>
             ),
-            onClick: () => navigate("/order-history"), // ✅ Navigate đến trang lịch sử đơn hàng
+            onClick: () => navigate("/order-history"),
           },
         ]}
         renderLeft={(item) => item.left}
         renderRight={(item) => item.right}
-        onClick={(item) => item.onClick?.()} // ✅ Thêm onClick handler
-      />
-    </Box>
-  );
-};
-
-const Other: FC = () => {
-  const onClick = useToBeImplemented();
-
-  return (
-    <Box className="m-4">
-      <ListRenderer
-        title="Khác"
-        onClick={onClick}
-        items={[
-          {
-            left: <Icon icon="zi-star" />,
-            right: (
-              <Box flex>
-                <Text.Header className="flex-1 items-center font-normal">
-                  Đánh giá đơn hàng
-                </Text.Header>
-                <Icon icon="zi-chevron-right" />
-              </Box>
-            ),
-          },
-          {
-            left: <Icon icon="zi-call" />,
-            right: (
-              <Box flex>
-                <Text.Header className="flex-1 items-center font-normal">
-                  Liên hệ và góp ý
-                </Text.Header>
-                <Icon icon="zi-chevron-right" />
-              </Box>
-            ),
-          },
-        ]}
-        renderLeft={(item) => item.left}
-        renderRight={(item) => item.right}
+        onClick={(item) => item.onClick?.()}
       />
     </Box>
   );
@@ -124,7 +83,6 @@ const ProfilePage: FC = () => {
       <Header showBackIcon={false} title="&nbsp;" />
       <Subscription />
       <Personal />
-      <Other />
     </Page>
   );
 };
