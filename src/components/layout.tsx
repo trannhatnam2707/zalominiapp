@@ -18,6 +18,9 @@ import { useHandlePayment } from "hooks";
 
 import OrderHistoryDebugPage from "pages/order-history-debug";
 
+import MeasurementAppointmentPage from "pages/measurement-appointment";
+import AppointmentHistoryPage from "pages/appointment-history";
+
 if (import.meta.env.DEV) {
   document.body.style.setProperty("--zaui-safe-area-inset-top", "24px");
 } else if (getSystemInfo().platform === "android") {
@@ -50,6 +53,10 @@ export const Layout: FC = () => {
           <Route path="/order-history" element={<OrderHistoryPage />}></Route>
 
           <Route path="/debug-orders" element={<OrderHistoryDebugPage />}></Route>
+
+          <Route path="/measurement-appointment" element={<MeasurementAppointmentPage />}></Route>
+          <Route path="/appointment-history" element={<AppointmentHistoryPage />}></Route>
+
 
           
         </Routes>

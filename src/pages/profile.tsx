@@ -1,4 +1,4 @@
-// src/pages/profile.tsx - ĐÃ XÓA PHẦN ĐÁNH GIÁ VÀ LIÊN HỆ
+// src/pages/profile.tsx - CẬP NHẬT
 import React, { FC } from "react";
 import { Box, Header, Icon, Page, Text } from "zmp-ui";
 import subscriptionDecor from "static/subscription-decor.svg";
@@ -67,6 +67,19 @@ const Personal: FC = () => {
               </Box>
             ),
             onClick: () => navigate("/order-history"),
+          },
+          // ✅ THÊM MỤC MỚI: LỊCH HẸN
+          {
+            left: <Icon icon="zi-calendar" />,
+            right: (
+              <Box flex>
+                <Text.Header className="flex-1 items-center font-normal">
+                  Lịch hẹn đo may
+                </Text.Header>
+                <Icon icon="zi-chevron-right" />
+              </Box>
+            ),
+            onClick: () => navigate("/appointment-history"),
           },
         ]}
         renderLeft={(item) => item.left}

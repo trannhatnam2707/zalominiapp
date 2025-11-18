@@ -1,3 +1,4 @@
+// src/components/product/picker.tsx - CẬP NHẬT
 import { FinalPrice } from "components/display/final-price";
 import { Sheet } from "components/fullscreen-sheet";
 import React, { FC, ReactNode, useEffect, useState } from "react";
@@ -11,6 +12,7 @@ import { Box, Button, Text } from "zmp-ui";
 import { MultipleOptionPicker } from "./multiple-option-picker";
 import { QuantityPicker } from "./quantity-picker";
 import { SingleOptionPicker } from "./single-option-picker";
+import { useNavigate } from "react-router"; // ✅ THÊM
 
 export interface ProductPickerProps {
   product?: Product;
@@ -45,6 +47,7 @@ export const ProductPicker: FC<ProductPickerProps> = ({
   );
   const [quantity, setQuantity] = useState(1);
   const setCart = useSetRecoilState(cartState);
+  const navigate = useNavigate(); // ✅ THÊM
 
   useEffect(() => {
     if (selected) {
@@ -53,12 +56,81 @@ export const ProductPicker: FC<ProductPickerProps> = ({
     }
   }, [selected]);
 
+  // ✅ HÀM KIỂM TRA OPTION "MAY THEO SỐ ĐO"
+  const checkMeasurementOption = (opts: SelectedOptions): boolean => {
+    console.log("🔍 Checking measurement option...");
+    console.log("Product:", product?.name);
+    console.log("Product variants:", product?.variants);
+    console.log("Selected options:", opts);
+
+    if (!product?.variants) {
+      console.log("❌ No variants found");
+      return false;
+    }
+
+    for (const variant of product.variants) {
+      console.log("Checking variant:", variant.id, variant.label);
+      
+      for (const option of variant.options) {
+        console.log("  - Option:", option.id, option.label);
+        
+        // ✅ KIỂM TRA ID hoặc label có chứa từ khóa liên quan đến "đo may"
+        const isMeasurementOption = 
+          option.id === "measurement" ||
+          option.id === "custom-measurement" ||
+          option.id === "may-do" || // ✅ THÊM ID CỦA BẠN
+          option.label?.toLowerCase().includes("may theo số đo") ||
+          option.label?.toLowerCase().includes("đo may") ||
+          option.label?.toLowerCase().includes("may đo") ||
+          option.label?.toLowerCase().includes("custom measurement");
+
+        console.log("    Is measurement option?", isMeasurementOption);
+
+        if (isMeasurementOption) {
+          // Kiểm tra xem option này có được chọn không
+          const variantValue = opts[variant.id];
+          console.log("    Variant value:", variantValue);
+          
+          // ✅ KIỂM TRA STRING (single option)
+          if (typeof variantValue === "string" && variantValue === option.id) {
+            console.log("✅ MATCHED! (string)");
+            return true;
+          }
+          
+          // ✅ KIỂM TRA ARRAY (multiple options)
+          if (Array.isArray(variantValue) && variantValue.includes(option.id)) {
+            console.log("✅ MATCHED! (array)");
+            return true;
+          }
+        }
+      }
+    }
+    
+    console.log("❌ No measurement option selected");
+    return false;
+  };
+
   const addToCart = () => {
     if (product) {
+      // ✅ KIỂM TRA NẾU CÓ CHỌN "MAY THEO SỐ ĐO"
+      const isMeasurement = checkMeasurementOption(options);
+      
+      if (isMeasurement) {
+        console.log("🎯 Phát hiện option 'May theo số đo' - Chuyển đến trang đặt lịch");
+        setVisible(false);
+        navigate("/measurement-appointment", {
+          state: {
+            product,
+            selectedOptions: options,
+          }
+        });
+        return; // Dừng lại, không thêm vào giỏ hàng
+      }
+
+      // ✅ LOGIC THÊM VÀO GIỎ HÀNG BÌNH THƯỜNG (không thay đổi)
       setCart((cart) => {
         let res = [...cart];
         if (selected) {
-          // updating an existing cart item, including quantity and size, or remove it if new quantity is 0
           const editing = cart.find(
             (item) =>
               item.product.id === product.id &&
@@ -83,7 +155,6 @@ export const ProductPicker: FC<ProductPickerProps> = ({
             }
           }
         } else {
-          // adding new item to cart, or merging if it already existed before
           const existed = cart.find(
             (item) =>
               item.product.id === product.id &&
@@ -107,6 +178,7 @@ export const ProductPicker: FC<ProductPickerProps> = ({
     }
     setVisible(false);
   };
+
   return (
     <>
       {children({
@@ -182,7 +254,11 @@ export const ProductPicker: FC<ProductPickerProps> = ({
                     fullWidth
                     onClick={addToCart}
                   >
-                    Thêm vào giỏ hàng
+                    {/* ✅ THAY ĐỔI TEXT NÚT NẾU LÀ "MAY THEO SỐ ĐO" */}
+                    {checkMeasurementOption(options) 
+                      ? "Đặt lịch đo may" 
+                      : "Thêm vào giỏ hàng"
+                    }
                   </Button>
                 )}
               </Box>
