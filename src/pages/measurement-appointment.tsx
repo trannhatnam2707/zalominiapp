@@ -13,12 +13,15 @@ const MeasurementAppointmentPage: FC = () => {
   const location = useLocation();
   const snackbar = useSnackbar();
   const stores = useRecoilValue(storesState);
+  const user = useRecoilValueLoadable(userState);
+  const manualPhone = useRecoilValue(manualPhoneState);
   
   const { product, selectedOptions } = location.state || {};
   
   const [selectedStoreId, setSelectedStoreId] = useState<number>(stores[0]?.id);
   const [appointmentDate, setAppointmentDate] = useState(+new Date());
   const [appointmentTime, setAppointmentTime] = useState(+new Date());
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const availableDates = useMemo(() => {
     const days: Date[] = [];
@@ -62,33 +65,110 @@ const MeasurementAppointmentPage: FC = () => {
 
   const selectedStore = stores.find(s => s.id === selectedStoreId);
 
-  const handleConfirm = () => {
-    if (!selectedStore) {
+  // ✅ LẤY SỐ ĐIỆN THOẠI VÀ TÊN NGƯỜI DÙNG
+  const getPhoneNumber = () => {
+    if (manualPhone) return manualPhone;
+    const savedPhone = localStorage.getItem('userPhone');
+    return savedPhone || "";
+  };
+
+  const getUserName = () => {
+    if (user.state === "hasValue") {
+      return user.contents.name;
+    }
+    return "Khách hàng";
+  };
+
+  const handleConfirm = async () => {
+    try {
+      setIsSubmitting(true);
+
+      // ✅ VALIDATE CỬA HÀNG
+      if (!selectedStore) {
+        snackbar.openSnackbar({
+          type: "error",
+          text: "Vui lòng chọn cửa hàng!",
+        });
+        return;
+      }
+
+      // ✅ VALIDATE SỐ ĐIỆN THOẠI
+      const phoneNumber = getPhoneNumber();
+      if (!phoneNumber || phoneNumber.length < 10) {
+        snackbar.openSnackbar({
+          type: "error",
+          text: "Vui lòng cập nhật số điện thoại hợp lệ!",
+        });
+        return;
+      }
+
+      // ✅ VALIDATE SẢN PHẨM
+      if (!product) {
+        snackbar.openSnackbar({
+          type: "error",
+          text: "Không tìm thấy sản phẩm!",
+        });
+        return;
+      }
+
+      const userName = getUserName();
+      const appointmentDate_obj = new Date(appointmentDate);
+      const appointmentTime_obj = new Date(appointmentTime);
+
+      console.log("=== CHUẨN BỊ LƯU LỊCH HẸN ===");
+      console.log("Phone:", phoneNumber);
+      console.log("Name:", userName);
+      console.log("Product:", product.name);
+      console.log("Store:", selectedStore.name);
+      console.log("Date:", appointmentDate_obj);
+      console.log("Time:", appointmentTime_obj);
+      console.log("Timestamp:", appointmentTime);
+
+      // ✅ CHUẨN BỊ DỮ LIỆU
+      const appointmentData = {
+        product,
+        selectedOptions,
+        store: selectedStore,
+        date: appointmentDate_obj,
+        time: appointmentTime_obj,
+        timestamp: appointmentTime,
+        phoneNumber: phoneNumber,
+        userName: userName,
+        note: "",
+      };
+
+      console.log("📅 Appointment Data:", appointmentData);
+
+      // ✅ LƯU VÀO FIREBASE
+      console.log("🚀 Đang lưu lịch hẹn...");
+      const appointmentId = await createMeasurementAppointment(appointmentData);
+      
+      console.log("✅ Lịch hẹn đã lưu! ID:", appointmentId);
+
+      snackbar.openSnackbar({
+        type: "success",
+        text: "Đặt lịch hẹn thành công!",
+        duration: 2000,
+      });
+
+      // ✅ CHUYỂN ĐẾN TRANG LỊCH HẸN SAU 1.5 GIÂY
+      setTimeout(() => {
+        navigate("/appointment-history", { replace: true });
+      }, 1500);
+
+    } catch (error) {
+      console.error("❌ Lỗi lưu lịch hẹn:", error);
+      
+      const errorMessage = error instanceof Error ? error.message : "Có lỗi xảy ra!";
+      
       snackbar.openSnackbar({
         type: "error",
-        text: "Vui lòng chọn cửa hàng!",
+        text: errorMessage,
+        duration: 3000,
       });
-      return;
+    } finally {
+      setIsSubmitting(false);
     }
-
-    const appointmentData = {
-      product,
-      selectedOptions,
-      store: selectedStore,
-      date: new Date(appointmentDate),
-      time: new Date(appointmentTime),
-      timestamp: appointmentTime,
-    };
-
-    console.log("📅 Appointment Data:", appointmentData);
-
-    snackbar.openSnackbar({
-      type: "success",
-      text: "Đặt lịch hẹn thành công!",
-      duration: 3000,
-    });
-
-    navigate("/", { replace: true });
   };
 
   const formatDate = (date: Date) => {
@@ -113,6 +193,7 @@ const MeasurementAppointmentPage: FC = () => {
       <Header title="Đặt Lịch Hẹn Đo May" />
       
       <Box className="p-4 space-y-4">
+        {/* THÔNG TIN SẢN PHẨM */}
         {product && (
           <Box className="bg-white rounded-xl p-4 space-y-2">
             <Text.Title size="small">Sản phẩm</Text.Title>
@@ -130,6 +211,7 @@ const MeasurementAppointmentPage: FC = () => {
           </Box>
         )}
 
+        {/* CHỌN CỬA HÀNG */}
         <Box className="bg-white rounded-xl p-4 space-y-3">
           <Text.Title size="small">Chọn cửa hàng</Text.Title>
           
@@ -164,6 +246,7 @@ const MeasurementAppointmentPage: FC = () => {
           </Box>
         </Box>
 
+        {/* CHỌN NGÀY */}
         <Box className="bg-white rounded-xl p-4 space-y-3">
           <Text.Title size="small">Chọn ngày</Text.Title>
           
@@ -174,7 +257,6 @@ const MeasurementAppointmentPage: FC = () => {
             title="Chọn ngày hẹn"
             value={{ date: appointmentDate }}
             formatPickedValueDisplay={({ date }) => {
-              // ✅ Xử lý đúng kiểu dữ liệu
               const dateValue = typeof date === 'object' && date !== null && 'value' in date 
                 ? date.value 
                 : date;
@@ -182,7 +264,6 @@ const MeasurementAppointmentPage: FC = () => {
               return `${getDayOfWeek(d)}, ${formatDate(d)}`;
             }}
             onChange={({ date }) => {
-              // ✅ Xử lý đúng kiểu dữ liệu
               if (date) {
                 const dateValue = typeof date === 'object' && 'value' in date ? date.value : date;
                 setAppointmentDate(+dateValue);
@@ -200,6 +281,7 @@ const MeasurementAppointmentPage: FC = () => {
           />
         </Box>
 
+        {/* CHỌN GIỜ */}
         <Box className="bg-white rounded-xl p-4 space-y-3">
           <Text.Title size="small">Chọn giờ</Text.Title>
           
@@ -210,14 +292,12 @@ const MeasurementAppointmentPage: FC = () => {
             title="Chọn giờ hẹn"
             value={{ time: appointmentTime }}
             formatPickedValueDisplay={({ time }) => {
-              // ✅ Xử lý đúng kiểu dữ liệu
               const timeValue = typeof time === 'object' && time !== null && 'value' in time 
                 ? time.value 
                 : time;
               return formatTime(new Date(timeValue));
             }}
             onChange={({ time }) => {
-              // ✅ Xử lý đúng kiểu dữ liệu
               if (time) {
                 const timeValue = typeof time === 'object' && 'value' in time ? time.value : time;
                 setAppointmentTime(+timeValue);
@@ -235,35 +315,43 @@ const MeasurementAppointmentPage: FC = () => {
           />
         </Box>
 
+        {/* THÔNG TIN TÓM TẮT */}
         <Box className="bg-blue-50 rounded-xl p-4 space-y-2">
           <Text size="xSmall" className="font-medium text-primary">
             📅 Thông tin lịch hẹn
           </Text>
           <Text size="xSmall" className="text-gray">
-            • Cửa hàng: {selectedStore?.name}
+            • Cửa hàng: {selectedStore?.name || "Chưa chọn"}
           </Text>
           <Text size="xSmall" className="text-gray">
             • Thời gian: {formatTime(new Date(appointmentTime))}, {getDayOfWeek(new Date(appointmentDate))} {formatDate(new Date(appointmentDate))}
+          </Text>
+          <Text size="xSmall" className="text-gray">
+            • Liên hệ: {getPhoneNumber() || "Chưa cập nhật"}
           </Text>
           <Text size="xxSmall" className="text-gray mt-2">
             💡 Vui lòng đến đúng giờ để được phục vụ tốt nhất
           </Text>
         </Box>
 
+        {/* NÚT HÀNH ĐỘNG */}
         <Box className="sticky bottom-0 bg-background pt-4 pb-safe space-y-2">
           <Button
             fullWidth
             variant="primary"
             type="highlight"
             onClick={handleConfirm}
+            disabled={isSubmitting || !selectedStore}
+            loading={isSubmitting}
           >
-            Xác nhận đặt lịch
+            {isSubmitting ? "Đang xử lý..." : "Xác nhận đặt lịch"}
           </Button>
           <Button
             fullWidth
             variant="secondary"
             type="neutral"
             onClick={() => navigate(-1)}
+            disabled={isSubmitting}
           >
             Quay lại
           </Button>
